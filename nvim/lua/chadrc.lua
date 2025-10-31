@@ -103,15 +103,15 @@ M.mason = {
     -- "deno",
     -- "vue-language-server",
     "tailwindcss-language-server",
-    -- "emmet_language_server",
-    -- "eslint-lsp",
+    "emmet_language_server",
+    "eslint-lsp",
 
     -- PHP
     "intelephense",
 
     -- C/C++
-    "clangd",
-    "clang-format",
+    -- "clangd",
+    -- "clang-format",
 
     -- CMake
     -- "neocmakelsp",
@@ -138,7 +138,7 @@ M.lsp = { signature = false }
 
 M.base46 = {
   theme = "github_dark_dimmed",
-  transparency = true,
+  transparency = false,
   theme_toggle = { "github_dark_dimmed", "sunrise_breeze" },
   hl_override = highlights.override,
   hl_add = highlights.add,
