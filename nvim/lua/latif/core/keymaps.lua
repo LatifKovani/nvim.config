@@ -29,21 +29,34 @@ keymap.set("n", "x", '"_x')
 keymap.set("n", "<leader>+", "<C-a>", { desc = "Increment number" }) -- increment
 keymap.set("n", "<leader>-", "<C-x>", { desc = "Decrement number" }) -- decrement
 
+---------------------
+-- Buffer Navigation -------------------
+
 -- Buffer navigation with Telescope
 keymap.set("n", "<leader>bb", "<cmd>Telescope buffers<CR>", { desc = "Show buffers" })
 keymap.set("n", "<Tab>", "<cmd>Telescope buffers<CR>", { desc = "Switch buffers" })
 
--- window management
+-- Navigate buffers without GUI
+keymap.set("n", "<leader>bn", ":bnext<CR>", { noremap = true, silent = true, desc = "Next buffer" })
+keymap.set("n", "<leader>bp", ":bprevious<CR>", { noremap = true, silent = true, desc = "Previous buffer" })
+keymap.set("n", "<leader>ba", "<C-^>", { noremap = true, silent = true, desc = "Alternate buffer" })
+keymap.set("n", "<leader>bd", ":bdelete<CR>", { noremap = true, silent = true, desc = "Delete buffer" })
+keymap.set("n", "<leader>bl", ":buffers<CR>:buffer<Space>", { noremap = true, desc = "List and select buffer" })
+keymap.set("n", "<S-Tab>", ":bprevious<CR>", { noremap = true, silent = true, desc = "Previous buffer" })
+
+---------------------
+-- Window Management -------------------
+
 keymap.set("n", "<leader>sv", "<C-w>v", { desc = "Split window vertically" }) -- split window vertically
 keymap.set("n", "<leader>sh", "<C-w>s", { desc = "Split window horizontally" }) -- split window horizontally
 keymap.set("n", "<leader>se", "<C-w>=", { desc = "Make splits equal size" }) -- make split windows equal width & height
 keymap.set("n", "<leader>sx", "<cmd>close<CR>", { desc = "Close current split" }) -- close current split window
+
+---------------------
+-- Tab Management -------------------
 
 keymap.set("n", "<leader>to", "<cmd>tabnew<CR>", { desc = "Open new tab" }) -- open new tab
 keymap.set("n", "<leader>tx", "<cmd>tabclose<CR>", { desc = "Close current tab" }) -- close current tab
 keymap.set("n", "<leader>tn", "<cmd>tabn<CR>", { desc = "Go to next tab" }) --  go to next tab
 keymap.set("n", "<leader>tp", "<cmd>tabp<CR>", { desc = "Go to previous tab" }) --  go to previous tab
 keymap.set("n", "<leader>tf", "<cmd>tabnew %<CR>", { desc = "Open current buffer in new tab" }) --  move current buffer to new tab
-
---bufferline Keymaps
-vim.keymap.set("n", "<leader>kj", ":bdelete<CR>", { noremap = true, silent = true, desc = "Close buffer" })

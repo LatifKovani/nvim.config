@@ -30,6 +30,7 @@ opt.termguicolors = true
 opt.background = "dark" -- colorschemes that can be light or dark will be made dark
 opt.signcolumn = "yes" -- show sign column so that text doesn't shift
 
+vim.api.nvim_set_hl(0, "CursorLineNr", { fg = "#ea6962", bold = true }) -- Red color for current line number
 -- backspace
 opt.backspace = "indent,eol,start" -- allow backspace on indent, end of line or insert mode start position
 

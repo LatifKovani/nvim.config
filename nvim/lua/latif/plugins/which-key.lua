@@ -28,7 +28,7 @@ return {
 				{ "<leader>o", group = "Options", icon = "" },
 				{ "<leader>t", group = "Terminal", icon = "" },
 				{ "<leader>x", group = "Diagnostics", icon = "" },
-				{ "<leader>k", group = "Buffers", icon = "" },
+				{ "<leader>b", group = "Buffers", icon = "" },
 				{ "<leader>l", group = "Git", icon = "" },
 				{ "<leader>G", group = "Git", icon = "" },
 			},
