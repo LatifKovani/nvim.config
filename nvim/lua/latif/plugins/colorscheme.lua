@@ -1,5 +1,6 @@
 return {
 	{
+
 		"sainnhe/gruvbox-material",
 		enabled = true,
 		priority = 1000,
@@ -9,26 +10,22 @@ return {
 			vim.g.gruvbox_material_background = "hard"
 			vim.g.gruvbox_material_ui_contrast = "high"
 			vim.g.gruvbox_material_float_style = "bright"
-			vim.g.gruvbox_material_statusline_style = "mix" -- Options: "original", "material", "mix", "afterglow"
+			vim.g.gruvbox_material_statusline_style = "mix"
 			vim.g.gruvbox_material_cursor = "auto"
 			vim.api.nvim_set_hl(0, "barbecue_normal", { bg = "none" })
-			-- vim.g.gruvbox_material_colors_override = { bg0 = '#16181A' } -- #0e1010
-			-- vim.g.gruvbox_material_better_performance = 1
 
 			vim.cmd.colorscheme("gruvbox-material")
 
-			-- Custom statusline highlights
-			-- vim.api.nvim_set_hl(0, "StatusLine", {
-			--   bg = "#1C2021", -- Dark gray background
-			--   fg = "#ebdbb2", -- Light text
-			--   bold = false
-			-- })
-			--
-			-- vim.api.nvim_set_hl(0, "StatusLineNC", {
-			--   bg = "#1C2021", -- Darker background for inactive windows
-			--   fg = "#928374", -- Muted text
-			--   bold = false
-			-- })
+			-- Create custom highlight group for curly braces
+			vim.api.nvim_set_hl(0, "CurlyBrace", { fg = "#c14a4a" })
+
+			-- Match only curly braces and highlight them
+			vim.api.nvim_create_autocmd({ "FileType", "BufEnter", "BufWinEnter" }, {
+				pattern = "*",
+				callback = function()
+					vim.fn.matchadd("CurlyBrace", "[{}]")
+				end,
+			})
 		end,
 	},
 	{
@@ -110,62 +107,6 @@ return {
 				BlinkCmpSignatureHelp = { bg = ayu_colors.mantle, fg = ayu_colors.text },
 				BlinkCmpSignatureHelpBorder = { bg = ayu_colors.mantle, fg = ayu_colors.surface2 },
 				BlinkCmpSignatureHelpActiveParameter = { bg = ayu_colors.surface0, fg = ayu_colors.peach, bold = true },
-
-				-- Snacks.nvim picker NvChad style
-				SnacksPicker = { bg = ayu_colors.base },
-				SnacksPickerBorder = { fg = ayu_colors.surface0, bg = ayu_colors.base },
-				SnacksPickerPreview = { bg = ayu_colors.base },
-				SnacksPickerPreviewBorder = { fg = ayu_colors.base, bg = ayu_colors.base },
-				SnacksPickerPreviewTitle = { fg = ayu_colors.base, bg = ayu_colors.green },
-				SnacksPickerBoxBorder = { fg = ayu_colors.base, bg = ayu_colors.base },
-				SnacksPickerInputBorder = { fg = ayu_colors.surface2, bg = ayu_colors.base },
-				SnacksPickerInputSearch = { fg = ayu_colors.text, bg = ayu_colors.base },
-				SnacksPickerList = { bg = ayu_colors.base },
-				SnacksPickerListBorder = { fg = ayu_colors.base, bg = ayu_colors.base },
-				SnacksPickerListTitle = { fg = ayu_colors.base, bg = ayu_colors.base },
-
-				-- Additional picker elements
-				SnacksPickerDir = { fg = ayu_colors.blue },
-				SnacksPickerFile = { fg = ayu_colors.text },
-				SnacksPickerMatch = { fg = ayu_colors.peach, bold = true },
-				SnacksPickerCursor = { bg = ayu_colors.surface0, fg = ayu_colors.text },
-				SnacksPickerSelected = { bg = ayu_colors.surface0, fg = ayu_colors.text },
-				SnacksPickerIcon = { fg = ayu_colors.blue },
-				SnacksPickerSource = { fg = ayu_colors.overlay1 },
-				SnacksPickerCount = { fg = ayu_colors.overlay1 },
-				SnacksPickerFooter = { fg = ayu_colors.overlay1 },
-				SnacksPickerHeader = { fg = ayu_colors.text, bold = true },
-				SnacksPickerSpecial = { fg = ayu_colors.peach },
-				SnacksPickerIndent = { fg = ayu_colors.surface1 },
-				SnacksPickerMulti = { fg = ayu_colors.peach },
-				SnacksPickerTitle = { fg = ayu_colors.text, bold = true },
-				SnacksPickerPrompt = { fg = ayu_colors.text },
-
-				-- Snacks core components
-				SnacksNotifierNormal = { bg = ayu_colors.mantle, fg = ayu_colors.text },
-				SnacksNotifierBorder = { bg = ayu_colors.mantle, fg = ayu_colors.surface2 },
-				SnacksNotifierTitle = { bg = ayu_colors.mantle, fg = ayu_colors.text, bold = true },
-				SnacksNotifierIcon = { bg = ayu_colors.mantle, fg = ayu_colors.blue },
-				SnacksNotifierIconInfo = { bg = ayu_colors.mantle, fg = ayu_colors.blue },
-				SnacksNotifierIconWarn = { bg = ayu_colors.mantle, fg = ayu_colors.yellow },
-				SnacksNotifierIconError = { bg = ayu_colors.mantle, fg = ayu_colors.red },
-
-				-- Snacks Dashboard
-				SnacksDashboardNormal = { bg = ayu_colors.base, fg = ayu_colors.text },
-				SnacksDashboardDesc = { bg = ayu_colors.base, fg = ayu_colors.subtext1 },
-				SnacksDashboardFile = { bg = ayu_colors.base, fg = ayu_colors.text },
-				SnacksDashboardDir = { bg = ayu_colors.base, fg = ayu_colors.blue },
-				SnacksDashboardFooter = { bg = ayu_colors.base, fg = ayu_colors.overlay1 },
-				SnacksDashboardHeader = { bg = ayu_colors.base, fg = ayu_colors.text, bold = true },
-				SnacksDashboardIcon = { bg = ayu_colors.base, fg = ayu_colors.blue },
-				SnacksDashboardKey = { bg = ayu_colors.base, fg = ayu_colors.peach },
-				SnacksDashboardTerminal = { bg = ayu_colors.base, fg = ayu_colors.text },
-				SnacksDashboardSpecial = { bg = ayu_colors.base, fg = ayu_colors.peach },
-
-				-- Snacks Terminal
-				SnacksTerminalNormal = { bg = ayu_colors.mantle, fg = ayu_colors.text },
-				SnacksTerminalBorder = { bg = ayu_colors.mantle, fg = ayu_colors.surface2 },
-				SnacksTerminalTitle = { bg = ayu_colors.mantle, fg = ayu_colors.text, bold = true },
 
 				-- Other UI elements
 				CmpItemMenu = { fg = ayu_colors.surface2 },
@@ -404,7 +345,8 @@ return {
 							PmenuSbar = { bg = colors.surface0 },
 							PmenuThumb = { bg = colors.surface2 },
 							PmenuExtra = { bg = colors.mantle, fg = colors.subtext1 },
-
+							TSPunctBracket = { fg = colors.red },
+							["@punctuation.bracket"] = { fg = colors.red },
 							-- Floating windows
 							NormalFloat = { bg = colors.mantle },
 							FloatBorder = { bg = colors.mantle, fg = colors.surface2 },
