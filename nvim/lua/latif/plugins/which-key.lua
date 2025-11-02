@@ -33,5 +33,8 @@ return {
 				{ "<leader>G", group = "Git", icon = "" },
 			},
 		})
+		vim.api.nvim_set_hl(0, "WhichKeyFloat", { bg = "#040405" }) -- Main background
+		vim.api.nvim_set_hl(0, "WhichKeyBorder", { bg = "#040405", fg = "#565f89" }) -- Border color
+		vim.api.nvim_set_hl(0, "WhichKeyNormal", { bg = "#040405" }) -- Normal text background
 	end,
 }
