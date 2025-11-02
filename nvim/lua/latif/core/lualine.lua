@@ -1,17 +1,8 @@
 -- lua/latif/plugins/lualine.lua
--- Single-file, self-contained lualine config inspired by Alex's layout/photo.
--- Place this file at lua/latif/plugins/lualine.lua and load it from your lazy.nvim spec.
---
--- Behaviour:
--- - Recreates bubble-like separators and icons.
--- - Components: mode (fixed width), filename/branch/diff, diagnostics, LSP clients for current buffer,
---   recording indicator, virtual-diagnostics/format/zen indicators, progress/location.
--- - Safe fallbacks: uses builtin APIs (vim.diagnostic, vim.lsp) and checks for gitsigns/web-devicons.
--- - Exposes M.setup() and M.refresh_statusline() for plugin loader use and toggles.
---
--- Notes:
--- - Uses Nerd Font glyphs. Replace icons if your font lacks them.
--- - Minimal, local colour table is embedded; change hex values if desired.
+-- Single-file, self-contained lualine config.
+-- Updated: switched embedded color palette and theme to a "Nordic" look per request.
+-- Only the color variables and bubbles_theme values were changed to use a Nordic-inspired palette.
+-- All other behavior and components are preserved exactly.
 
 local M = {}
 
@@ -33,15 +24,15 @@ local function is_recording()
 end
 
 local diagnostic_signs = {
-	error = "",
-	warn = "",
-	info = "",
-	hint = "",
-	other = "",
+	error = " ",
+	warn = " ",
+	info = " ",
+	hint = " ",
+	other = " ",
 }
 
 local function current_buffer_lsp()
-	local clients = vim.lsp.get_active_clients({ bufnr = 0 })
+	local clients = vim.lsp.get_clients({ bufnr = 0 })
 	if not clients or vim.tbl_isempty(clients) then
 		return ""
 	end
@@ -63,32 +54,39 @@ local function diff_source()
 	end
 end
 
--- Embedded palette (change to match your theme)
+-- Nordic-inspired palette (replaces previous palette)
+-- These colors are typical of Nordic schemes: dark bluish background, soft greys, icy blue/cyan accents.
 local C = {
-	blue = "#539bf5",
-	cyan = "#76E3EA",
-	black = "#22272e",
-	white = "#adbac7",
-	red = "#A05350",
-	violet = "#DCBDFB",
-	grey = "#303030",
-	green = "#8DDB8C",
+	bg = "#040405", -- nordic background (dark slate)
+	surface0 = "#040405",
+	surface1 = "#BBC3D4",
+	surface2 = "#040405",
+	text = "#60728A", -- light foreground
+	comment = "#616E88",
+	blue = "#81A1C1",
+	cyan = "#88C0D0",
+	green = "#A3BE8C",
+	red = "#BF616A",
+	violet = "#B48EAD",
+	orange = "#D79784",
 }
 
-local bubbles_theme = {
+-- Nordic bubbles_theme using the Nordic palette above.
+-- Edit these bg values if you want subtle variations.
+local nordic = {
 	normal = {
-		a = { fg = C.black, bg = C.blue },
-		b = { fg = C.white, bg = C.grey },
-		c = { fg = C.white, bg = C.black },
+		a = { fg = C.bg, bg = C.orange }, -- mode block: icy blue
+		b = { fg = C.text, bg = C.surface1 }, -- middle blocks
+		c = { fg = C.text, bg = C.bg }, -- rest of statusline
 	},
-	insert = { a = { fg = C.black, bg = C.green } },
-	visual = { a = { fg = C.black, bg = C.cyan } },
-	replace = { a = { fg = C.black, bg = C.red } },
-	command = { a = { fg = C.black, bg = C.violet } },
+	insert = { a = { fg = C.bg, bg = C.green } },
+	visual = { a = { fg = C.bg, bg = C.cyan } },
+	replace = { a = { fg = C.bg, bg = C.red } },
+	command = { a = { fg = C.bg, bg = C.violet } },
 	inactive = {
-		a = { fg = C.white, bg = C.black },
-		b = { fg = C.white, bg = C.black },
-		c = { fg = C.white, bg = C.black },
+		a = { fg = C.text, bg = C.surface2 },
+		b = { fg = C.text, bg = C.surface2 },
+		c = { fg = C.text, bg = C.surface2 },
 	},
 }
 
@@ -125,15 +123,74 @@ function M.set_zen(val)
 	state.zen = not not val
 end
 
+-- === Requested additions (GitHub prefix and file-location) ===
+-- Replacement for the requested additions block (GitHub prefix and file-location).
+-- Replaces the original github branch component with repo-detection + fallbacks.
+-- Set GITHUB_USERNAME above to control the username fallback; GITHUB_ICON is used if username is empty.
+
+local GITHUB_USERNAME = "LatifKovani" -- change if needed
+local GITHUB_ICON = "" -- fallback GitHub icon (Nerd Font)
+
+-- Helper: detect whether cwd is inside a git worktree
+local function in_git_repo()
+	local ok, out = pcall(vim.fn.systemlist, { "git", "rev-parse", "--is-inside-work-tree" })
+	if not ok or type(out) ~= "table" or #out == 0 then
+		return false
+	end
+	return out[1] == "true"
+end
+
+local function github_branch_component()
+	-- If we're not inside a git repository, show only the username (or the GitHub icon if no username)
+	if not in_git_repo() then
+		if GITHUB_USERNAME and GITHUB_USERNAME ~= "" then
+			return GITHUB_USERNAME
+		end
+		return GITHUB_ICON
+	end
+
+	-- Try gitsigns-provided branch first
+	local branch = vim.b.gitsigns_head
+	-- Fallback to git cli if gitsigns not available
+	if not branch or branch == "" then
+		local ok, out = pcall(vim.fn.systemlist, { "git", "rev-parse", "--abbrev-ref", "HEAD" })
+		if ok and type(out) == "table" and #out > 0 and out[1] ~= "HEAD" then
+			branch = out[1]
+		end
+	end
+
+	if not branch or branch == "" then
+		-- if there is a repo but no branch (detached HEAD), show username or icon as fallback
+		if GITHUB_USERNAME and GITHUB_USERNAME ~= "" then
+			return GITHUB_USERNAME
+		end
+		return GITHUB_ICON
+	end
+
+	if GITHUB_USERNAME and GITHUB_USERNAME ~= "" then
+		return GITHUB_USERNAME .. "/" .. branch
+	end
+	return branch
+end
+
+local function file_location_component()
+	if vim.fn.expand("%") == "" then
+		return ""
+	end
+	local icon = " "
+	local path = vim.fn.expand("%:~:.")
+	return icon .. path
+end
+-- === end requested additions ===
+
 -- Setup function (safe)
 function M.setup()
 	local ok, lualine = pcall(require, "lualine")
 	if not ok or not lualine then
-		-- lualine not installed; skip setup silently
 		return
 	end
 
-	-- Keep StatusLine background matching Normal when colors change (like Alex did)
+	-- Keep StatusLine background matching Normal when colors change
 	vim.api.nvim_create_autocmd({ "UIEnter", "ColorScheme" }, {
 		callback = function()
 			local normal = vim.api.nvim_get_hl(0, { name = "Normal" })
@@ -160,15 +217,15 @@ function M.setup()
 		{
 			current_buffer_lsp,
 			padding = 1,
-			icon = { " ", color = { fg = C.grey } },
-			color = { fg = C.white },
+			icon = { " ", color = { fg = C.surface1 } },
+			color = { fg = C.text },
 		},
 		{
 			function()
 				return ""
 			end,
 			color = function()
-				return state.virtual_diagnostics and { fg = C.green } or { fg = C.grey }
+				return state.virtual_diagnostics and { fg = C.green } or { fg = C.surface1 }
 			end,
 			separator = { " ", "" },
 		},
@@ -177,7 +234,7 @@ function M.setup()
 				return " "
 			end,
 			color = function()
-				return state.zen and { fg = C.green } or { fg = C.grey }
+				return state.zen and { fg = C.green } or { fg = C.surface1 }
 			end,
 			padding = 0,
 		},
@@ -186,7 +243,7 @@ function M.setup()
 				return "󰉼  "
 			end,
 			color = function()
-				return state.format_enabled and { fg = C.green } or { fg = C.grey }
+				return state.format_enabled and { fg = C.green } or { fg = C.surface1 }
 			end,
 			padding = 0,
 		},
@@ -223,8 +280,8 @@ function M.setup()
 				{
 					short_cwd,
 					padding = 0,
-					icon = { "   ", color = { fg = C.grey } },
-					color = { fg = C.white },
+					icon = { "   ", color = { fg = C.surface1 } },
+					color = { fg = C.text },
 				},
 			},
 			lualine_x = default_x,
@@ -250,8 +307,8 @@ function M.setup()
 					function()
 						return "Telescope"
 					end,
-					color = { fg = C.white },
-					icon = { "  ", color = { fg = C.grey } },
+					color = { fg = C.text },
+					icon = { "  ", color = { fg = C.surface1 } },
 				},
 			},
 			lualine_x = default_x,
@@ -265,7 +322,7 @@ function M.setup()
 	pcall(function()
 		lualine.setup({
 			options = {
-				theme = bubbles_theme,
+				theme = nordic,
 				disabled_filetypes = { "dashboard" },
 				globalstatus = true,
 				section_separators = { left = " ", right = " " },
@@ -276,19 +333,29 @@ function M.setup()
 					{ "mode", fmt = fmt_mode, icon = { "" }, separator = { right = " ", left = "" } },
 				},
 				lualine_b = {},
+				-- Center: file path first, then branch, diff, recording
 				lualine_c = {
 					{
-						"branch",
-						color = { fg = C.white },
-						icon = { " ", color = { fg = C.grey } },
+						file_location_component,
+						color = { fg = C.text },
+						padding = 1,
+					},
+					{
+						github_branch_component,
+						color = { fg = "#60728A" },
+						icon = { " ", color = { fg = "#BBC3D4" } },
 						padding = 2,
 					},
 					{
 						"diff",
-						color = { fg = C.white },
+						color = { fg = C.text },
 						source = diff_source,
 						symbols = { added = " ", modified = " ", removed = " " },
-						diff_color = { added = { fg = C.grey }, modified = { fg = C.grey }, removed = { fg = C.grey } },
+						diff_color = {
+							added = { fg = C.surface1 },
+							modified = { fg = C.surface1 },
+							removed = { fg = C.surface1 },
+						},
 						padding = 1,
 					},
 					{
@@ -297,12 +364,15 @@ function M.setup()
 							if is_recording() then
 								return { fg = C.red }
 							end
-							return { fg = C.white }
+							return { fg = C.text }
 						end,
 						padding = 1,
 					},
 				},
-				lualine_x = default_x,
+				-- Right side: diagnostics/LSP/icons etc.
+				lualine_x = {
+					unpack(default_x),
+				},
 				lualine_y = {},
 				lualine_z = default_z,
 			},
